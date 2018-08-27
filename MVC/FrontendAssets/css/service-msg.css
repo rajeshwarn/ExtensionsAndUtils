@@ -1,0 +1,27 @@
+﻿div.successValidationMsg {
+    border: 2px solid lightgreen;
+    border-radius: 5%;
+}
+
+div.errorValidationMsg {
+    border: 2px solid lightcoral;
+    border-radius: 5%;
+}
+
+div.SvcMsg 
+{
+    background: whitesmoke;
+    height: auto;
+    text-align: center;
+    vertical-align: middle;
+    padding: 20px;
+    font-size: 12px;
+    /*font-weight: bold;*/
+    cursor:pointer;
+    margin-bottom: 10px;
+    z-index:105;
+    
+    margin-left:auto;
+    margin-right:auto;
+    width:50%;
+}
