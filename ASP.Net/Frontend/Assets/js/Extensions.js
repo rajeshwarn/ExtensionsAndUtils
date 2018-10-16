@@ -1,18 +1,19 @@
-﻿
+jQuery.fn.exists = function () { return this.length > 0; };
 
-/*function isStringEmpty(text) {
-        
-    var result = text.replace(/^\s+|\s+$/gm, '');
+jQuery.expr[':'].containsInsensitive = function (a, i, m) {
+    return jQuery(a).text().toUpperCase()
+        .indexOf(m[3].toUpperCase()) >= 0;
+};
 
-    if (result == "")
-        return true;
-    return false;
-}*/
+jQuery.fn.justtext = function () {
 
-function isStringEmpty(value) {
-    var valueWithoutSpaces = $.trim(value);
-    return valueWithoutSpaces == "" || valueWithoutSpaces == null || valueWithoutSpaces === undefined;
-}
+    return $(this).clone()
+            .children()
+            .remove()
+            .end()
+            .text().replace(/ /g, '').replace(/\n/g, '');
+
+};
 
 $.fn.serializeObject = function () {
     var o = {};
@@ -29,27 +30,6 @@ $.fn.serializeObject = function () {
     });
     return o;
 };
-
-jQuery.fn.exists = function () { return this.length > 0; };
-
-function exists(elem) {
-    var array = $(elem).FindWhereFn(function (e) {
-        return e != null;
-    });
-    if (array == null) array = [];
-    return $(elem) !== undefined && $(elem).length > 0 && array.length > 0;
-}
-
-jQuery.fn.justtext = function () {
-
-    return $(this).clone()
-            .children()
-            .remove()
-            .end()
-            .text().replace(/ /g, '').replace(/\n/g, '');
-
-};
-
 
 $.fn.showOption = function() { //tem em contar outros browser para além do chrome (no chrome o simple .hide ou .show funcionam mas em outros browsers não)
     this.each(function() {
@@ -112,204 +92,6 @@ else
     return $(this).find(" select :selected").text();
 };
 
-function postRequest() {
-    AddAntiForgeryToken = function(data) {
-        data.__RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
-        return data;
-    };
-    return {
-        dataToSend: function(data) {
-            return AddAntiForgeryToken(data);
-        }
-    };
-}
-
-
-function setOnlyNumbersBehaviour(inputElement, maxNumber, minNumber) {
-    if ($(inputElement) !== undefined && $(inputElement).length > 0)
-        $(inputElement).each(function () {
-            $(this).on("keypress keyup blur", function (e) {
-                var elem = $(this);
-                try {
-                    //para permitir apenas numeros
-                    var val = $(elem).val();
-                    var code = e.charCode || e.keyCode;
-                    var keyCode = (e.keyCode && e.keyCode > 0) || !e.which ? e.keyCode : e.which;
-
-                    if (e.charCode && keyCode && e.charCode == keyCode) {
-                        var charCode = (e.which) ? e.which : code;
-                        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                            return false;
-                        }
-                        else {
-                            var charcodeStr = String.fromCharCode(charCode);
-                            if (isNaN(charcodeStr)) {
-                                return false;
-                            }
-                            else {
-                                val = (val + charcodeStr) * 1;
-
-                                if (maxNumber != null && val > maxNumber) {
-                                    $(elem).val(maxNumber);
-                                    return false;
-                                }
-                                else if (minNumber != null && val < minNumber) {
-                                    $(elem).val(minNumber);
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (er) {
-                    return false;
-                }
-            });
-        });
-}
-
-/*
-function setOnlyNumbersBehaviour(inputElement, maxNumber, minNumber) {
-    if ($(inputElement) !== undefined && $(inputElement).length > 0)
-        $(inputElement).each(function () {
-            $(this).on("keypress keyup blur", function (e) {
-                try {
-                    //para permitir apenas numeros
-                    var val = $(this).val();
-                    var code = e.charCode || e.keyCode;
-                    var charCode = (e.which) ? e.which : code;
-                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                        return false;
-                    }
-                    else {
-                        val = (val + String.fromCharCode(charCode)) * 1;
-
-                        if (maxNumber != null && val > maxNumber) {
-                            $(this).val(maxNumber);
-                            return false;
-                        }
-                        else if (minNumber != null && val < minNumber) {
-                            $(this).val(minNumber);
-                            return false;
-                        }
-                    }
-                }
-                catch (er) {
-                    return false;
-                }
-            });
-        });
-}
-*/
-
-
-function setOnlyLettersBehaviour(inputElement) {
-    if ($(inputElement) !== undefined && $(inputElement).length > 0)
-        $(inputElement).each(function () {
-            $(this).on("keypress keyup blur", function (e) {
-                var code = e.charCode || e.keyCode;
-                var charCode = (e.which) ? e.which : code;
-                var val = String.fromCharCode(charCode);
-                if (!/^[a-zA-Z]+$/.test(val))
-                    return false;
-            });
-        });
-}
-
-function setPhoneNumberBehaviour(inputElement) {
-    if ($(inputElement) !== undefined && $(inputElement).length > 0)
-        $(inputElement).each(function () {
-            $(this).unbind("keypress keyup blur").on("keypress keyup blur", function (e) {
-                //para permitir apenas numeros, "+", "-", "." e " "
-                var code = e.charCode || e.keyCode;
-                var charCode = (e.which) ? e.which : code;
-                if ((charCode < 48 || charCode > 57) && charCode != 43 && charCode != 45 && charCode != 46 && charCode != 32)
-                    return false;
-            });
-        });
-}
-
-function setCharactersLimit(inputElement, charNumber, errorMsg) {
-    if ($(inputElement) !== undefined && $(inputElement).length > 0)
-        $(inputElement).unbind('keyup change input paste').bind('keyup change input paste', function (e) {
-            var $this = $(this);
-            var val = $this.val();
-            var valLength = val.length;
-
-            if (valLength > charNumber) {
-                $this.val($this.val().substring(0, charNumber));
-
-                if (errorMsg !== undefined && errorMsg != null && $.trim(errorMsg).length > 0)
-                    alert(errorMsg);
-            }
-        });
-}
-
-function setNumberLimit(inputElement, maxNumber, minNumber, errorMsg) {
-    if ($(inputElement) !== undefined && $(inputElement).length > 0)
-        $(inputElement).unbind('keyup change input paste').bind('keyup change input paste', function (e) {
-            var $this = $(this);
-            var val = $this.val();
-
-            if (val > maxNumber) {
-                $this.val(maxNumber);
-
-                if (errorMsg !== undefined && errorMsg != null && $.trim(errorMsg).length > 0)
-                    alert(errorMsg);
-            }
-            else if (val < minNumber) {
-                $this.val(minNumber);
-
-                if (errorMsg !== undefined && errorMsg != null && $.trim(errorMsg).length > 0)
-                    alert(errorMsg);
-            }
-        });
-}
-
-jQuery.expr[':'].containsInsensitive = function (a, i, m) {
-    return jQuery(a).text().toUpperCase()
-        .indexOf(m[3].toUpperCase()) >= 0;
-};
-
-function parseBool(elem) {
-    if (elem === undefined || elem == null)
-        return false;
-
-    var valueToCompare = $.trim(elem);
-    valueToCompare = valueToCompare.toLowerCase();
-
-    return valueToCompare == "true";
-}
-
-function parseToInt(elem) {
-    try {
-        if (isStringEmpty(elem))
-            return 0;
-
-        return elem * 1;
-    }
-    catch (err) {
-        return 0;
-    }
-}
-
-
-$.fn.serializeObject = function () {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function () {
-        if (o[this.name] !== undefined) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
-            }
-            o[this.name].push(this.value || '');
-        } else {
-            o[this.name] = this.value || '';
-        }
-    });
-    return o;
-};
-
 $.fn.isChecked = function () {
     var checked = this.checked || this.is(":checked") ||
         parseBool(this.prop("checked")) || this.prop("checked") == "checked" ||
@@ -323,73 +105,6 @@ $.fn.isDisabled = function () {
         parseBool(this.attr("disabled")) || this.attr("disabled") == "disabled";
     return disabled;
 };
-
-function getDateFromString(date) {
-    try {
-        try {
-            var dsplit = date.split("-");
-            return new Date(dsplit[2], dsplit[1] - 1, dsplit[0]);
-        }
-        catch (e) {
-            return new Date(date);
-        }
-    }
-    catch (e) {
-        return new Date($.now());
-    }
-}
-
-
-function getStringFromDate(date, separator) {
-    if (date == null)
-        return "";
-
-    try {
-        if (!exists(separator))
-            separator = '-';
-
-        var dd = date.getDate();
-        var mm = date.getMonth() + 1; //January is 0!
-
-        var yyyy = date.getFullYear();
-        if (dd < 10)
-            dd = '0' + dd;
-
-        if (mm < 10)
-            mm = '0' + mm;
-
-        return dd + separator + mm + separator + yyyy;
-    }
-    catch (ex) { }
-
-    return "";
-}
-
-
-function StringFormat() {
-    // The string containing the format items (e.g. "{0}")
-    // will and always has to be the first argument.
-    var theString = arguments[0];
-
-    // start with the second argument (i = 1)
-    for (var i = 1; i < arguments.length; i++) {
-        // "gm" = RegEx options for Global search (more than one instance)
-        // and for Multiline search
-        var regEx = new RegExp("\\{" + (i - 1) + "\\}", "gm");
-        theString = theString.replace(regEx, arguments[i]);
-    }
-
-    return theString;
-}
-
-
-function escapeRegExp(str) {
-    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-}
-
-function replaceAll(str, find, replace) {
-    return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
-}
 
 $.fn.shift = function () {
     var bottom = this.get(0);
@@ -421,7 +136,6 @@ Array.prototype.inArrayWhereFn = function (comparerFn) {
     /*
     var array = [{ name: "tom", text: "tasty" }];
     var element = { name: "tom", text: "tasty" };
-
     if (!this.inArray(function(e) { 
             return e.name === element.name && e.text === element.text; 
         })) 
@@ -438,6 +152,16 @@ Array.prototype.SafeAny = function (comparerFn) {
         return true;
     else
         return this.inArrayWhereFn(comparerFn);
+};
+$.fn.SafeAny = function (comparerFn) {
+	var elem = this.get();
+
+	if (!exists(elem))
+		return false;
+	else if (exists(elem) && isStringEmpty(comparerFn))
+		return true;
+	else
+		return elem.inArrayWhereFn(comparerFn);
 };
 
 Array.prototype.FindWhereFn = function (comparerFn) {
@@ -456,7 +180,6 @@ Array.prototype.FindWhereFn = function (comparerFn) {
             });
     */
 };
-
 $.fn.FindWhereFn = function (comparerFn) {
 
     try {
@@ -496,7 +219,6 @@ Array.prototype.FirstOrDefaultFn = function (comparerFn) {
             });
     */
 };
-
 $.fn.FirstOrDefaultFn = function (comparerFn) {
     var aux = null; var thisObj = this.get();
     
@@ -611,20 +333,29 @@ Array.prototype.Take = function (numberMax, numberMin) {
     }
 };
 
+Array.prototype.IsArrayEqual = function (array) {
+	// if the other array is a falsy value, return
+	if (!array)
+		return false;
 
+	// compare lengths - can save a lot of time 
+	if (this.length != array.length)
+		return false;
 
-function sort_by(field, reverse, primer) {
-
-    var key = primer ?
-        function (x) { var val = primer(x[field]); return $.isNumeric(val) ? val * 1 : val } :
-        function (x) { var val = x[field]; return $.isNumeric(val) ? val * 1 : val };
-
-    reverse = !reverse ? 1 : -1;
-
-    return function (a, b) {
-        return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-    }
-};
+	for (var i = 0, l=this.length; i < l; i++) {
+		// Check if we have nested arrays
+		if (this[i] instanceof Array && array[i] instanceof Array) {
+			// recurse into the nested arrays
+			if (!this[i].equals(array[i]))
+				return false;       
+		}           
+		else if (this[i] != array[i]) { 
+			// Warning - two different object instances will never be equal: {x:20} != {x:20}
+			return false;   
+		}           
+	}       
+	return true;
+}
 
 Array.prototype.OrderBy = function (field) {
 
@@ -657,7 +388,6 @@ Array.prototype.Max = function (field) {
         return null;
     }
 };
-
 $.fn.Max = function (field) {
 
     try {
@@ -680,7 +410,6 @@ Array.prototype.WhereMax = function (field) {
         return null;
     }
 };
-
 $.fn.WhereMax = function (field) {
 
     try {
@@ -703,7 +432,6 @@ Array.prototype.Min = function (field) {
         return null;
     }
 };
-
 $.fn.Min = function (field) {
 
     try {
@@ -726,7 +454,6 @@ Array.prototype.WhereMin = function (field) {
         return null;
     }
 };
-
 $.fn.WhereMin = function (field) {
 
     try {
@@ -737,30 +464,3 @@ $.fn.WhereMin = function (field) {
         return null;
     }
 };
-
-
-var ExistsPropInObj = function (obj, searchName) {
-    var exists = false;
-    for (var attrname in obj) {
-        if (attrname == searchName)
-            exists = false;
-    }
-    return exists;
-};
-
-var MergeObjects = function (obj1, obj2) {
-    for (var attrname in obj2) {
-        obj1[attrname] = obj2[attrname];
-    }
-    return obj1;
-};
-
-function getPos(el) {
-    // yay readability
-    for (var lx = 0, ly = 0;
-        el != null;
-        lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
-    return { x: lx, y: ly };
-}
-
-
