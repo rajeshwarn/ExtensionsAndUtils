@@ -712,3 +712,49 @@ function getIconFontList() {
     catch (err) { }
     return iconsList;
 };
+
+function convertTimeUnit(timeMin, timeMax) {
+    switch (timeMin)
+    {
+        case "Year": //anos e o máximo tambem
+        case "1":
+            return 1;
+        case "Month": //meses
+        case "2":
+            switch (timeMax)
+            {
+                case "Year":
+                case "1":
+                    return 12;
+                default: return 1;
+            }
+        case "Week": //meses
+        case "3":
+            switch (timeMax) {
+                case "Year":
+                case "1":
+                    return 52;
+                case "Month":
+                case "2":
+                    return 4;
+                default: return 1;
+            }
+        case "Day": //dias - 3
+        case "4":
+            switch (timeMax)
+            {
+                case "Year":
+                case "1":
+                    return 365;
+                case "Month":
+                case "2":
+                    return 30;
+                case "Week":
+                case "3": 
+                    return 7;
+                default: return 1;
+            }
+    }
+    
+    return 0;
+}
