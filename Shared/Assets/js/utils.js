@@ -27,7 +27,7 @@ function existsObj(obj) {
 	return obj !== undefined && obj != null;
 }
 
-function setOnlyNumbersBehaviour(inputElement, maxNumber, minNumber, keepEvents) {
+function setOnlyNumbersBehaviour(inputElement, maxNumber, minNumber, keepEvents, extraFn, withZeros) {
     if ($(inputElement) !== undefined && $(inputElement).length > 0)
         $(inputElement).each(function () {
 			if(keepEvents != null && !keepEvents)
@@ -35,6 +35,8 @@ function setOnlyNumbersBehaviour(inputElement, maxNumber, minNumber, keepEvents)
 
             $(this).on("keypress keyup blur", function (e) {
                 var elem = $(this);
+                if (extraFn)
+                    extraFn(elem, val);
                 try {
                     //para permitir apenas numeros
                     var val = $(elem).val();
@@ -52,21 +54,18 @@ function setOnlyNumbersBehaviour(inputElement, maxNumber, minNumber, keepEvents)
                                 return false;
                             }
                             else {
-                                val = (val + charcodeStr) * 1;
+                                var initialVal = (val + charcodeStr);
+                                val = initialVal * 1;
 
-                                if (maxNumber != null && val > maxNumber) {
-                                    $(elem).val(maxNumber);
-                                    return false;
-                                }
-                                else if (minNumber != null && val < minNumber) {
-                                    $(elem).val(minNumber);
-                                    return false;
-                                }
-                                else
-                                {
-                                    $(elem).val(val);
-                                    return false;
-                                }
+                                if (maxNumber != null && val > maxNumber)
+                                    val = maxNumber;
+                                else if (minNumber != null && val < minNumber)
+                                    val = minNumber;
+                                else if (withZeros)
+                                    val = initialVal;
+
+                                $(elem).val(val);
+                                return false;
                             }
                         }
                     }
@@ -77,6 +76,7 @@ function setOnlyNumbersBehaviour(inputElement, maxNumber, minNumber, keepEvents)
             });
         });
 }
+		    
 
 function setOnlyDecimalsBehaviour(inputElement, maxNumber, minNumber) {
     if ($(inputElement) !== undefined && $(inputElement).length > 0)
