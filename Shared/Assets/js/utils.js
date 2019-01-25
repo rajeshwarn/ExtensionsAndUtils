@@ -561,7 +561,7 @@ function ValidateContact(contactType, contact) {
     */
 
     switch (contactType) {
-        //telefone, telemóvel, fax
+        //phone, mobile, fax
         case 1: case 2: case 3:
             var value = contact;
             value = value.replace(/\(/g, "").replace(/\)/g, "").replace(/\-/g, "").replace(/\ /g, "").trim();
@@ -570,14 +570,14 @@ function ValidateContact(contactType, contact) {
                 return false;
             }
 
-            //valida 4 ou 5 numeros
+            //validate 4 or 5 numbers
             var pattern = new RegExp(/^[0-9]{4,5}/);
             var valid = pattern.test(value);
 
             if (valid) return true;
 
 
-            //valida 9 numeros
+            //validate 9 numbers
             var pattern = new RegExp(/^[0-9]{9}/);
             var valid = pattern.test(value);
 
@@ -585,7 +585,7 @@ function ValidateContact(contactType, contact) {
 
             var numerico = value.replace(/\(/g, "").replace(/\)/g, "").replace(/\-/g, "").replace(/\+/g, "").replace(/\ /g, "").trim();
 
-            //valida 12 numeros e +
+            //validate 12 numbers e +
             pattern = new RegExp(/^[0-9]{11,12}/);
             valid = pattern.test(numerico);
 
@@ -757,4 +757,32 @@ function convertTimeUnit(timeMin, timeMax) {
     }
     
     return 0;
+}
+
+//From: http://pt.wikipedia.org/wiki/N%C3%BAmero_de_identifica%C3%A7%C3%A3o_fiscal
+function validateNIF (nif) {
+    var checkDigit = 0;
+
+    if (nif && nif.length == 9) {
+        var validFirstChars = [1, 2, 5, 6, 8, 9];
+        var charControl = parseInt(nif.charAt(8));
+        var firstChar = parseInt(nif.charAt(0));
+
+        if (validFirstChars.indexOf(firstChar) != -1) {
+            checkDigit = firstChar * 9;
+
+            for (var i = 2; i <= 8; i++) 
+                checkDigit += nif.charAt(i - 1) * (10 - i);
+
+            checkDigit = 11 - (checkDigit % 11);
+
+            if (checkDigit >= 10)
+                checkDigit = 0;
+
+            if (checkDigit == charControl)
+                return true;
+        }
+    }
+
+    return false;
 }
